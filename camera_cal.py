@@ -4,13 +4,13 @@ import glob
 import pickle
 
 
-# Prepare object points, like (0,0,0), (1,0,0), ..., (8,5,0)
-objp = np.zeros((9*6, 3), np.float32)
-objp[:,:2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
-
-# Arrays to store object opints and image points from all the images
+# Arrays to store object points and image points from all the images
 objpoints = [] # 3D points in real world space
 imgpoints = [] # 2D points in image plane
+
+# Prepare object points, like (0,0,0), (1,0,0), (2,0,0) ..., (8,5,0)
+objp = np.zeros((9*6, 3), np.float32)
+objp[:,:2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2) # x, y coordinates
 
 # Make a list of calibration images
 images = glob.glob('./camera_cal/calibration*.jpg')
