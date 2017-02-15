@@ -5,23 +5,18 @@ import glob
 from tracker import Tracker
 
 
-# Read in the saved matrix and distortion coefficients
-dist_pickle = pickle.load(open('./camera_cal/calibration_pickle.p', 'rb'))
-mtx = dist_pickle['mtx']
-dist = dist_pickle['dist']
-
 
 def abs_sobel_thresh(img, orient='x', sobel_kernel=3, thresh=(0, 255)):
     """
     Returns an array of the same size as the input image of ones where gradients
     were in the threshold range, and zeros everywhere else.
-    :param img: input image in rgb format.
+    :param img: input image in BGR format.
     :param orient: orientation in which to take the gradient (x or y).
     :param sobel_kernel: size of the sobel kernel to apply (must be odd number >= 3).
     :param thresh: threshold (0 to 255) for determining which gradients to include when creating binary output.
     """
     # Convert image to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Take the absolute value of the derivative in the given x or y orientation
     if orient == 'x':
         abs_sobel = np.absolute(cv2.Sobel(gray, cv2.CV_64F, 1, 0))
@@ -40,12 +35,12 @@ def mag_thresh(img, sobel_kernel=3, thresh=(0, 255)):
     """
     Returns an array of the same size as the input image of ones where gradients
     were in the threshold range, and zeros everywhere else.
-    :param img: input image in rgb format.
+    :param img: input image in BGR format.
     :param sobel_kernel: size of the sobel kernel to apply (must be odd number >= 3).
     :param thresh: threshold (0 to 255) for determining which gradients to include when creating binary output.
     """
     # Convert image to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Take the gradient in x and y separately
     sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
     sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
@@ -64,12 +59,12 @@ def dir_thresh(img, sobel_kernel=3, thresh=(0, np.pi/2)):
     """
     Returns a binary image of the same size as the input image of ones where gradient directions
     were in the threshold range, and zeros everywhere else.
-    :param img: input image in rgb format.
+    :param img: input image in BGR format.
     :param sobel_kernel: size of the sobel kernel to apply (must be odd number >= 3).
     :param thresh: threshold (0 to pi/2) for determining which gradients to include when creating binary output.
     """
     # Convert image to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     # Take the gradient in x and y separately
     sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
     sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
@@ -82,22 +77,33 @@ def dir_thresh(img, sobel_kernel=3, thresh=(0, np.pi/2)):
     return dir_binary
 
 
-def color_thresh(img, s_thresh=(0, 255)):
+def color_thresh(img, r_thresh=(2, 255), s_thresh=(0, 255)):
     """
     Returns a binary image of the same size as the input image of ones where pixel values
     were in the threshold range, and zeros everywhere else.
-    :param img: input image in rgb format.
-    :param s_thresh: threshold (0 to 255) for determining which pixels from s_channel to include when creating binary output.
+    :param img: input image in BGR format.
+    :param r_thresh: threshold (0 to 255) for determining which pixels from r_channel to include in binary output.
+    :param s_thresh: threshold (0 to 255) for determining which pixels from s_channel to include in binary output.
     """
+    # Apply a threshold to the R channel
+    r_channel = img[:,:,2]
+    r_binary = np.zeros_like(img[:,:,0])
+    # Create a mask of 1's where pixel value is within the given thresholds
+    r_binary[(r_channel > r_thresh[0]) & (r_channel <= r_thresh[1])] = 1
+
     # Convert to HLS color space
-    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+    hls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
     # Apply a threshold to the S channel
     s_channel = hls[:,:,2]
     s_binary = np.zeros_like(s_channel)
     # Create a mask of 1's where pixel value is within the given thresholds
     s_binary[(s_channel > s_thresh[0]) & (s_channel <= s_thresh[1])] = 1
+
+    # Combine two channels
+    combined = np.zeros_like(img[:,:,0])
+    combined[(s_binary == 1) | (r_binary == 1)] = 1
     # Return binary output image
-    return s_binary
+    return combined
 
 
 def window_mask(width, height, img_ref, center, level):
@@ -105,7 +111,7 @@ def window_mask(width, height, img_ref, center, level):
     output[int(img_ref.shape[0]-(level+1)*height):int(img_ref.shape[0]-level*height), max(0, int(center-width)):min(int(center+width),img_ref.shape[1])] = 1
     return output
 
-
+'''
 # Make a list of test images
 images = glob.glob('./test_images/test*.jpg')
 
@@ -220,5 +226,42 @@ for idx, fname in enumerate(images):
     # Save undistorted files to disk
     write_name = './test_images/tracked'+str(idx+1)+'.jpg'
     cv2.imwrite(write_name, result)
+'''
 
+
+if __name__=='__main__':
+
+    # Read in the saved matrix and distortion coefficients
+    dist_pickle = pickle.load(open('./camera_cal/calibration_pickle.p', 'rb'))
+    mtx = dist_pickle['mtx']
+    dist = dist_pickle['dist']
+
+    # Make a list of test image file names
+    images = glob.glob('./test_images/test*.jpg')
+    images.append('./test_images/straight_lines1.jpg')
+    images.append('./test_images/straight_lines2.jpg')
+
+    # Loop over image file names, read in image and process
+    for idx, fname in enumerate(images):
+        # Read image in from file
+        img = cv2.imread(fname)
+        # Undistort the image
+        img = cv2.undistort(img, mtx, dist, None, mtx)
+
+        # Threshold gradient
+        grad_binary = np.zeros_like(img[:,:,0])
+        mag_binary = mag_thresh(img, sobel_kernel=9, thresh=(50, 255))
+        dir_binary = dir_thresh(img, sobel_kernel=15, thresh=(0.7, 1.3))
+        grad_binary[((mag_binary == 1) & (dir_binary == 1))] = 1
+
+        # Threshold color
+        color_binary = color_thresh(img, r_thresh=(220, 255), s_thresh=(150, 255))
+
+        # Combine gradient and color thresholds
+        combo_binary = np.zeros_like(img[:,:,0])
+        combo_binary[(grad_binary == 1) | (color_binary == 1)] = 255
+
+        # Uncomment below code to save undistorted images during testing
+        write_name = './test_images/combo_thresh'+str(idx+1)+'.jpg'
+        cv2.imwrite(write_name, combo_binary)
 
