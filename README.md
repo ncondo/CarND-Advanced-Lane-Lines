@@ -38,3 +38,12 @@ The steps taken to complete this project are as follows:
 
 ### Camera Calibration
 
+The code for this step is contained in `camera_cal.py` and the sample images and outputs can be found in the camera_cal folder.
+
+I started by preparing "object points", which will be the (x,y,z) coordinates of the chessboard corners in the world. The provided sample images of chessboards are fixed on the (x,y) plane at z=0, such that the object points are the same for each calibration image. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time all of the chessboard corners are successfully detected in a sample image. With each successful chessboard detection, `imgpoints` will be appended with the (x,y) pixel position of each of the corners. 
+I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the OpenCV `calibrateCamera()` function. The resulting camera matrix and distortion coefficients are then used to undistort images using the OpenCV `undistort()` function. Here an original image (left) and an undistorted image (right):
+
+![Original](camera_cal/test_example2.jpeg)      ![Undistorted](camera_cal/output_example2.jpeg)
+
+
+### Distortion Correction
