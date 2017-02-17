@@ -47,3 +47,8 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 
 ### Distortion Correction
+
+Using the camera matrix and distortion coefficients produced in the previous step, I undistort all incoming raw images using the OpenCV `undistort()` function. I use this function in my `apply_lines()` function which can be seen on line 38 of the `lane_tracker.py` file. Notice the difference in position of the white car between the raw image (left) and undistorted image (right):
+
+![Original Image](test_images/test_example1.jpeg)   ![Undistorted](output_images/example_undist1.jpeg)
+
