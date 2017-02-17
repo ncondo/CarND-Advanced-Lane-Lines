@@ -6,7 +6,6 @@ from lane_tracker import LaneTracker
 
 
 def main(input_video):
-
     # Read in the saved matrix and distortion coefficients
     dist_pickle = pickle.load(open('./camera_cal/calibration_pickle.p', 'rb'))
     mtx = dist_pickle['mtx']
@@ -29,8 +28,4 @@ if __name__=='__main__':
 
     # argv[1] should be name of input video to apply lane lines
     main(sys.argv[1])
-
-    
-
-
 
