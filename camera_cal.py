@@ -41,6 +41,10 @@ img_size = (img.shape[1], img.shape[0])
 # Perform camera clibration given object points and image points
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_size, None, None)
 
+# Undistort the image
+img = cv2.undistort(img, mtx, dist, None, mtx)
+cv2.imwrite('./camera_cal/undistorted1.jpg', img)
+
 # Save the camera calibration result for later use
 dist_pickle = {}
 dist_pickle['mtx'] = mtx
