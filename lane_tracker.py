@@ -164,7 +164,7 @@ class LaneTracker:
         pts = np.hstack((pts_left, pts_right))
 
         # Create an image to draw the lines
-        warp_zero = np.zeros_like(warped_binary).astype(np.uint8)
+        warp_zero = np.zeros_like(warped_binary[:-20]).astype(np.uint8)
         color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
         # Draw the lane onto the warped blank image
