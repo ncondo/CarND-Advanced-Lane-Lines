@@ -110,7 +110,7 @@ To find the pixels of the lane lines I take a histogram of the thresholded binar
 
 After saving all of the pixel indicies within the windows of interest, I use the numpy `polyfit()` function to fit a second order line to the pixels in the left and right lanes. To increase efficiency, after finding the lane lines I avoid doing an exhaustive search in subsequent frames by instead only searching within a margin around the previous found line positions. A plot of the search windows and the fitted lane lines are shown below:
 
-![Line Fit](output_images/example_lines_fit3.jpg) 
+![Line Fit](output_images/example_lines_fit3.jpeg) 
 
 The code to detect the lane pixels and fit the lines can be found on lines 80-146 of the `lane_tracker.py` file.
 
