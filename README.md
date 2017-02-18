@@ -128,10 +128,17 @@ The code for calculating the vehicle position can be found on lines 195-200 of t
 
 ### Warp Detected Lane Boundaries onto Original Image
 
-After detecting the lane lines, calculating the radius of curvature, and finding the vehicles position within the lane, I unwarp the image back to the original perspective using the OpenCV `warpPerspective()` function as before, but this time using the inverse matrix.
+After detecting the lane lines, calculating the radius of curvature, and finding the vehicles position within the lane, I unwarp the image back to the original perspective using the OpenCV `warpPerspective()` function as before, but this time using the inverse matrix. This code can be found on line 174 of the `lane_tracker.py` file.
 
 
 ### Visual Display of the Lane Boundaries, Curvature, and Vehicle Position
 
 ![Final Output](output_images/final1.jpg)
+
+A link to my video result can be found [here](https://youtu.be/irduXA5iaxs)
+
+
+### Discussion
+
+My pipeline works well on the project video, but I haven't yet extended it to prove effective on the challenge videos. One reason is due to the lane shift seen in the challenge video, along with the different color blacktop in the lane due to construction. A fix for that could be to check the distance between the two detected lane lines. Filtering out lines if they are not the correct distance apart, about 3.7 meters, will filter out other lines like those in the challenge video. Another reason my algorithim currently fails on the harder challenge video is I am currently averaging the lines over 15 frames to smoothin the output of the line boundaries. This produces a nice output for the project video, but fails when faced with consecutive sharp turns. I could reduce the number of frames being averaged over, and maybe use a weighted average instead. I could also experiment with other checks such as determing that the detected left and right lane lines are relatively parallel to be sure the lines are in fact the lane lines. I plan to experiment with these ideas and make my algorithm robust enough to complete the challenge videos in the coming days.
 
