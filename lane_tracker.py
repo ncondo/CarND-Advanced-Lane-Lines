@@ -79,7 +79,7 @@ class LaneTracker:
 
         # Set the width of the windows +/- margin
         margin = 100
-
+        # Only search the entire image if lines have not been previously detected
         if self.detected == False:
             # Take a histogram of the bottom half of the image
             histogram = np.sum(warped_binary[int(warped_binary.shape[0]/2):,:], axis=0)

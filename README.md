@@ -102,7 +102,17 @@ Below is the same applied to the thresholded binary image as described in the pr
 The code for performing the perspective transform can be found on lines 54-70 in the `lane_tracker.py` file.
 
 
-### Detect Lane Pixels and Fit
+### Detect Lane Pixels and Fit Lines
+
+To find the pixels of the lane lines I take a histogram of the thresholded binary image by adding up the pixel values along each column in the lower half of the image using `np.sum(img[img.shape[0]/2:,:], axis=0)` as seen on line 85 of the `lane_tracker.py` file. Since pixels are either 0 or 1 in my binary image, the two most prominent peaks in the histogram will be good indicators of the x-position of the base of the lane lines. I then use that as a starting point for where to search for the lane lines, using a sliding window places around the line centers to find and follow the lines up to the top of the frame. A plot of such a histogram can be seen below:
+
+![Histogram](output_images/lane_pixel_histogram.png)
+
+After saving all of the pixel indicies within the windows of interest, I use the numpy `polyfit()` function to fit a second order line to the pixels in the left and right lanes. To increase efficiency, after finding the lane lines I avoid doing an exhaustive search in subsequent frames by instead only searching within a margin around the previous found line positions. A plot of the search windows and the fitted lane lines are shown below:
+
+![Line Fit](output_images/binary_lines_fit3.jpg) 
+
+The code to detect the lane pixels and fit the lines can be found on lines 80-146 of the `lane_tracker.py` file.
 
 
 
