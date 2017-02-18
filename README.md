@@ -79,7 +79,7 @@ The code for producing the thresholded binary images can be found in `thresholds
 ### Perspective Transform
 
 A perspective transform maps the points in a given image to a different, desired, image points with a new perspective. I use the OpenCV functions getPerspectiveTransform() and warpPerspective() to generate a bird's-eye view of a lane from above, which is useful for calculating the lane curvature. I chose the source points and destination points used to perform the transform following the example given in the course:
-`
+```
 src = np.float32(
     [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
     [((img_size[0] / 6) - 10), img_size[1]],
@@ -90,7 +90,7 @@ dst = np.float32(
     [(img_size[0] / 4), img_size[1]],
     [(img_size[0] * 3 / 4), img_size[1]],
     [(img_size[0] * 3 / 4), 0]])
-`
+```
 Using these points resulted in the following undistorted image (left) transformed to a bird's-eye perspective (right):
 
 ![Undist](output_images/example_undist3.jpeg)  ![Bird's-eye](output_images/example_birdseye1.jpeg)
