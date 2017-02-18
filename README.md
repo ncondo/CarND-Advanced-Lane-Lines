@@ -39,12 +39,13 @@ The steps taken to complete this project are as follows:
 
 ### Camera Calibration
 
-The code for this step is contained in `camera_cal.py` and the sample images and outputs can be found in the camera_cal folder.
-
+Cameras typically do not generate perfect images; some of the objects in the images can get stretched or scewed in various ways, especially near the edges. We can correct for this by performing a camera calibration.
 I started by preparing "object points", which will be the (x,y,z) coordinates of the chessboard corners in the world. The provided sample images of chessboards are fixed on the (x,y) plane at z=0, such that the object points are the same for each calibration image. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time all of the chessboard corners are successfully detected in a sample image. With each successful chessboard detection, `imgpoints` will be appended with the (x,y) pixel position of each of the corners. 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the OpenCV `calibrateCamera()` function. The resulting camera matrix and distortion coefficients are then used to undistort images using the OpenCV `undistort()` function. Here an original image (left) and an undistorted image (right):
 
 ![Original](camera_cal/test_example2.jpeg)      ![Undistorted](camera_cal/output_example2.jpeg)
+
+The code for camera calibration is contained in `camera_cal.py` and the sample images and outputs can be found in the camera_cal folder.
 
 
 ### Distortion Correction
@@ -56,13 +57,11 @@ Using the camera matrix and distortion coefficients produced in the previous ste
 
 ### Thresholded Binary Images
 
-The code for producing the thresholded binary images can be found in `thresholds.py` and some sample output images can be found in the output_images folder.
-
 In order to accurately find the lane lines in an image, I applied a number of thresholding techniques to filter out potential noise (such as shadows, different color lanes, other cars, etc). I first applied a color threshold, where I save only the R (red) channel of the RGB image, and combine it with the S (saturation) channel of the image after converting it to HLS space. The reason I keep the red channel is because it does a good job of preserving the lanes in the image, but especially the yellow lane which other filters sometimes fail to detect. The binary image of the R channel (left) and the S channel (right) can be seen below:
 
 ![R Binary](output_images/example_rthresh1.jpeg)  ![S Binary](output_images/example_sthresh1.jpeg)
 
-Next, I apply thresholds on the gradients using the OpenCV `Sobel()` function. I apply a threshold on the magnitude of the gradient to filter out weak signals using the `mag_thresh()` function which can be found on line 6 of the `thresholds.py` file. I apply a threshold on the direction of the gradient in order to filter out horizonal lines, as the lane lines should be relatively vertical. You can find this `dir_thresh()` function on line 30 of the `thresholds.py` file. The binary image using the magnitude threshold (left) and directional threshold (right) can be seen below:
+Next, I apply thresholds on the gradients using the OpenCV `Sobel()` function. I apply a threshold on the magnitude of the gradient to filter out weak signals using the `mag_thresh()` function which can be found starting on line 6 of the `thresholds.py` file. I apply a threshold on the direction of the gradient in order to filter out horizonal lines, as the lane lines should be relatively vertical. You can find this `dir_thresh()` function starting on line 30 of the `thresholds.py` file. The binary image using the magnitude threshold (left) and directional threshold (right) can be seen below:
 
 ![Mag Binary](output_images/example_magthresh1.jpeg)  ![Dir Binary](output_images/example_dirthresh1.jpeg)
 
@@ -74,6 +73,36 @@ I then combine the color and gradient thresholded binary images to produce the f
 
 ![Color Binary](output_images/example_undist2.jpeg)  ![Grad Binary](output_images/example_combothresh1.jpeg)
 
+The code for producing the thresholded binary images can be found in `thresholds.py` and some sample output images can be found in the output_images folder.
+
 
 ### Perspective Transform
+
+A perspective transform maps the points in a given image to a different, desired, image points with a new perspective. I use the OpenCV functions getPerspectiveTransform() and warpPerspective() to generate a bird's-eye view of a lane from above, which is useful for calculating the lane curvature. I chose the source points and destination points used to perform the transform following the example given in the course:
+`
+src = np.float32(
+    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
+    [((img_size[0] / 6) - 10), img_size[1]],
+    [(img_size[0] * 5 / 6) + 60, img_size[1]],
+    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
+dst = np.float32(
+    [[(img_size[0] / 4), 0],
+    [(img_size[0] / 4), img_size[1]],
+    [(img_size[0] * 3 / 4), img_size[1]],
+    [(img_size[0] * 3 / 4), 0]])
+`
+Using these points resulted in the following undistorted image (left) transformed to a bird's-eye perspective (right):
+
+![Undist](output_images/example_undist3.jpeg)  ![Bird's-eye](output_images/example_birdseye1.jpeg)
+
+Below is the same applied to the thresholded binary image as described in the previous step:
+
+![Undist](output_images/example_undist3.jpeg)  ![Bird's-eye](output_images/example_binarybirdseye1.jpeg)
+
+The code for performing the perspective transform can be found on lines 54-70 in the `lane_tracker.py` file.
+
+
+### Detect Lane Pixels and Fit
+
+
 
