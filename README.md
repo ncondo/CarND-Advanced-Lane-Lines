@@ -34,7 +34,7 @@ The steps taken to complete this project are as follows:
 * Detect lane pixels and fit to find the lane boundary.
 * Determine the curvature of the lane and vehicle position with respect to center.
 * Warp the detected lane boundaries back onto the original image.
-* Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
+* Output visual display of the lane boundaries, numerical estimation of lane curvature, and vehicle position.
 
 
 ### Camera Calibration
@@ -126,5 +126,12 @@ To calculate the vehicle's position within the lane lines, I first assume that t
 The code for calculating the vehicle position can be found on lines 195-200 of the `lane_tracker.py` file.
 
 
+### Warp Detected Lane Boundaries onto Original Image
 
+After detecting the lane lines, calculating the radius of curvature, and finding the vehicles position within the lane, I unwarp the image back to the original perspective using the OpenCV `warpPerspective()` function as before, but this time using the inverse matrix.
+
+
+### Visual Display of the Lane Boundaries, Curvature, and Vehicle Position
+
+![Final Output](output_images/final1.jpg)
 
