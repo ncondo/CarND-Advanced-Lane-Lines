@@ -99,7 +99,7 @@ Below is the same applied to the thresholded binary image as described in the pr
 
 ![Undist](output_images/example_undist3.jpeg)  ![Bird's-eye](output_images/example_binarybirdseye1.jpeg)
 
-The code for performing the perspective transform can be found on lines 54-70 in the `lane_tracker.py` file.
+The code for performing the perspective transform can be found on lines 54-70 of the `lane_tracker.py` file.
 
 
 ### Detect Lane Pixels and Fit Lines
@@ -113,6 +113,18 @@ After saving all of the pixel indicies within the windows of interest, I use the
 ![Line Fit](output_images/example_lines_fit3.jpeg) 
 
 The code to detect the lane pixels and fit the lines can be found on lines 80-146 of the `lane_tracker.py` file.
+
+
+### Determine Curvature of Lane and Vehicle Position
+
+The radius of curvature of the curve at a particular point is defined as the radius of the approximating circle, which changes as we move along the curve. A good tutorial of the radius of curvature can be found [here](http://www.intmath.com/applications-differentiation/8-radius-curvature.php) which describes the mathmatecal formula used to calculate it. In addition, I also needed to convert the radius from pixel values to real world space. I used the estimated figures given in the project lectures based on U.S. regulations that require a minimum lane width of 3.6 meters and dashed lane lines of 3 meters long each. 
+
+The code for calculating the radius of curvature can be found on lines 183-193 of the `lane_tracker.py` file.
+
+To calculate the vehicle's position within the lane lines, I first assume that the car's dashcam is mounted at the center of the car. I then find the difference between the center of the image and the center of the two lane lines I've detected to determine the distance from the center of the lane (converted from pixels to meters).
+
+The code for calculating the vehicle position can be found on lines 195-200 of the `lane_tracker.py` file.
+
 
 
 
