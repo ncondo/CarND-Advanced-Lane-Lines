@@ -40,7 +40,7 @@ The steps taken to complete this project are as follows:
 ### Camera Calibration
 
 Cameras typically do not generate perfect images; some of the objects in the images can get stretched or scewed in various ways, especially near the edges. We can correct for this by performing a camera calibration.
-I started by preparing "object points", which will be the (x,y,z) coordinates of the chessboard corners in the world. The provided sample images of chessboards are fixed on the (x,y) plane at z=0, such that the object points are the same for each calibration image. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time all of the chessboard corners are successfully detected in a sample image. With each successful chessboard detection, `imgpoints` will be appended with the (x,y) pixel position of each of the corners. 
+I started by preparing "object points", which will be the (x,y,z) coordinates of the chessboard corners in the world. The provided sample images of chessboards are fixed on the (x,y) plane at z=0, such that the object points are the same for each calibration image. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time all of the chessboard corners are successfully detected in a sample image. With each successful chessboard detection, `imgpoints` will be appended with the (x,y) pixel position of each of the corners.
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the OpenCV `calibrateCamera()` function. The resulting camera matrix and distortion coefficients are then used to undistort images using the OpenCV `undistort()` function. Here an original image (left) and an undistorted image (right):
 
 ![Original](camera_cal/test_example2.jpeg)      ![Undistorted](camera_cal/output_example2.jpeg)
@@ -110,14 +110,14 @@ To find the pixels of the lane lines I take a histogram of the thresholded binar
 
 After saving all of the pixel indicies within the windows of interest, I use the numpy `polyfit()` function to fit a second order line to the pixels in the left and right lanes. To increase efficiency, after finding the lane lines I avoid doing an exhaustive search in subsequent frames by instead only searching within a margin around the previous found line positions. A plot of the search windows and the fitted lane lines are shown below:
 
-![Line Fit](output_images/example_lines_fit3.jpeg) 
+![Line Fit](output_images/example_lines_fit3.jpeg)
 
 The code to detect the lane pixels and fit the lines can be found on lines 80-146 of the `lane_tracker.py` file.
 
 
 ### Determine Curvature of Lane and Vehicle Position
 
-The radius of curvature of the curve at a particular point is defined as the radius of the approximating circle, which changes as we move along the curve. A good tutorial of the radius of curvature can be found [here](http://www.intmath.com/applications-differentiation/8-radius-curvature.php) which describes the mathmatecal formula used to calculate it. In addition, I also needed to convert the radius from pixel values to real world space. I used the estimated figures given in the project lectures based on U.S. regulations that require a minimum lane width of 3.6 meters and dashed lane lines of 3 meters long each. 
+The radius of curvature of the lane at a particular point is defined as the radius of the approximating circle, which changes as we move along the curve. A good tutorial of the radius of curvature can be found [here](http://www.intmath.com/applications-differentiation/8-radius-curvature.php) which describes the mathematical formula used to calculate it. In addition, I also needed to convert the radius from pixel values to real world space. I used the estimated figures given in the project lectures based on U.S. regulations that require a minimum lane width of 3.6 meters and dashed lane lines of 3 meters long each. 
 
 The code for calculating the radius of curvature can be found on lines 183-193 of the `lane_tracker.py` file.
 
@@ -141,4 +141,3 @@ A link to my video result can be found [here](https://youtu.be/irduXA5iaxs)
 ### Discussion
 
 My pipeline works well on the project video, but I haven't yet extended it to prove effective on the challenge videos. One reason is due to the lane shift seen in the challenge video, along with the different color blacktop in the lane due to construction. A fix for that could be to check the distance between the two detected lane lines. Filtering out lines if they are not the correct distance apart, about 3.7 meters, will filter out other lines like those in the challenge video. Another reason my algorithim currently fails on the harder challenge video is I am currently averaging the lines over 15 frames to smoothin the output of the line boundaries. This produces a nice output for the project video, but fails when faced with consecutive sharp turns. I could reduce the number of frames being averaged over, and maybe use a weighted average instead. I could also experiment with other checks such as determing that the detected left and right lane lines are relatively parallel to be sure the lines are in fact the lane lines. I plan to experiment with these ideas and make my algorithm robust enough to complete the challenge videos in the coming days.
-
